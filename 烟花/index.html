@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+   <title>Document</title>
+   <style>
+      html,
+      body {
+         width: 100vw;
+         height: 100vh;
+         background-color: #000;
+         overflow: hidden;
+      }
+
+      body {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+
+      .fire {
+         position: absolute;
+         width: 5px;
+         height: 50px;
+         border-radius: 5px;
+      }
+
+      .fireline {
+         position: absolute;
+         width: 50px;
+         height: 5px;
+         transform-origin: left center;
+         background-color: transparent;
+      }
+
+      .fireworks {
+         position: absolute;
+         top: 0;
+         width: 4px;
+         height: 4px;
+         border-radius: 50%;
+         transition: all .8s;
+      }
+
+      .fireworks2 {
+         position: absolute;
+         top: 0;
+         width: 10px;
+         height: 1px;
+         border-radius: 50%;
+         transition: all .8s;
+      }
+
+
+      .fires {
+         position: absolute;
+         width: 5px;
+         height: 5px;
+         border-radius: 50%;
+      }
+
+      .btn {
+         position: absolute;
+         bottom: 50px;
+         width: 50px;
+         height: 50px;
+         border-radius: 50%;
+         border: 0;
+         color: #fff;
+      }
+
+      .btn_left {
+         left: 50px;
+         background-image: linear-gradient(-90deg, red, blue);
+      }
+
+      .btn_right {
+         right: 50px;
+         background-image: linear-gradient(90deg, red, blue);
+      }
+
+      .fontfire {
+         font-size: 80px;
+         white-space: nowrap;
+         text-shadow: 1px 0 #fff, 1px 1px #fff, 1px -1px #fff, 0 1px #fff, 0 -1px #fff, -1px 0 #fff, -1px 1px #fff, -1px -1px #fff;
+         transform: scale(0);
+         transition: all 1s;
+      }
+   </style>
+</head>
+
+<body>
+   <button class="btn btn_left">放烟花</button>
+   <button class="btn btn_right">输入文字</button>
+   <script src="js/riseAnimate.js"></script>
+   <script>
+      // 产生随机数
+      function getRandom(min, max) {
+         return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      // 生成随机颜色
+      const randomColor = () => {
+         return `rgb(${getRandom(127, 255)}, ${getRandom(127, 255)}, ${getRandom(127, 255)})`;
+      };
+      // 生成烟花类
+      class Fire {
+         constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.init();
+         }
+         init() {
+            const fire = document.createElement('span');
+            fire.className = 'fire';
+            fire.style.left = this.x + 'px';
+            fire.style.top = document.documentElement.clientHeight + 'px';
+            const color = randomColor();
+            fire.style.backgroundImage = `linear-gradient(0deg, transparent 0, ${color} 100%)`;
+            document.body.appendChild(fire);
+            riseAnimate(fire, this.y, () => {
+               fire.remove();
+               this.createFireLine();
+            });
+         }
+         createFireLine() {
+            const colorArr = [];
+            const size = getRandom(5, 10);
+            const fireworksSize = Math.random() > 0.5 ? true : false;
+            const lines = 20;
+            for (let i = 0; i < size; i++) {
+               colorArr.push(randomColor());
+            }
+            for (let i = 0; i < lines; i++) {
+               this.fireLine = document.createElement('span');
+               this.fireLine.className = 'fireline';
+               this.fireLine.style.left = this.x + 'px';
+               this.fireLine.style.top = this.y + 'px';
+               this.fireLine.style.transform = `translateY(-50%) rotate(${i * (360 / lines)}deg)`;
+               document.body.appendChild(this.fireLine);
+               this.createFireworks(this.fireLine, size, colorArr, fireworksSize);
+            }
+         }
+         createFireworks(obj, size, colorArr, fireworksSize) {
+            setTimeout(() => {
+               obj.remove();
+            }, 2000);
+            for (let i = 0; i < size; i++) {
+               this.fireworks = document.createElement('span');
+               this.fireworks.className = fireworksSize ? 'fireworks' : 'fireworks2';
+               this.fireworks.style.left = '0';
+               this.fireworks.style.backgroundImage = `linear-gradient(90deg, transparent 0, ${colorArr[i]} 100%)`;
+               obj.appendChild(this.fireworks);
+               const index = i;
+               this.moveFireworks(this.fireworks, index);
+            }
+         }
+         moveFireworks(obj, i) {
+            setTimeout(() => {
+               obj.style.left = (i + 1) * 10 + 'px';
+            }, i * 50);
+            setTimeout(() => {
+               obj.style.opacity = 0;
+            }, 1000);
+         }
+      }
+      const html = document.documentElement;
+      // 随机生成烟花位置
+      const produceFire = () => {
+         const x = Math.random() * html.clientWidth;
+         const y = getRandom(100, html.clientHeight - 200);
+         new Fire(x, y);
+      };
+      produceFire();
+      setInterval(function() {
+         produceFire();
+      }, 3000);
+      document.querySelector('.btn_left').addEventListener('click', function() {
+         setTimeout(function() {
+            for (let i = 0; i < 4; i++) {
+               produceFire();
+            }
+         }, 1000);
+      });
+      // 烟花文字类
+      class FontFire {
+         constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.font = prompt('请输入烟花文字').trim();
+            if (this.font != '') this.init();
+         }
+         init() {
+            const fire = document.createElement('span');
+            fire.className = 'fire';
+            fire.style.left = this.x + 'px';
+            fire.style.top = document.documentElement.clientHeight + 'px';
+            const color = randomColor();
+            fire.style.backgroundImage = `linear-gradient(0deg, transparent 0, ${color} 100%)`;
+            document.body.appendChild(fire);
+            riseAnimate(fire, this.y, () => {
+               fire.remove();
+               this.createFont();
+            });
+         }
+         createFont() {
+            this.fontFire = document.createElement('span');
+            this.fontFire.className = 'fontfire';
+            this.fontFire.innerHTML = this.font;
+            document.body.appendChild(this.fontFire);
+            this.moveFont(this.fontFire);
+         }
+         moveFont(obj) {
+            setTimeout(() => {
+               obj.style.transform = 'scale(1)';
+               setTimeout(() => {
+                  obj.style.opacity = 0;
+                  obj.style.transform = 'scale(1.1) translate(-10px, 10px)';
+                  setTimeout(() => {
+                     obj.remove();
+                     for (let i = 0; i < 4; i++) {
+                        const x = this.x + parseFloat((Math.random() < 0.5 ? '-' : '') + getRandom(50, 100));
+                        const y = this.y + parseFloat((Math.random() < 0.5 ? '-' : '') + getRandom(30, 50));
+                        this.createFires(x, y);
+                     }
+                  }, 1000);
+               }, 500);
+            }, 50)
+         }
+         createFires(x, y) {
+            for (let i = 0; i < getRandom(30, 32); i++) {
+               this.fires = document.createElement('span');
+               this.fires.className = 'fires';
+               this.fires.style.left = x + 'px';
+               this.fires.style.top = y + 'px';
+               this.fires.style.backgroundColor = randomColor();
+               document.body.appendChild(this.fires);
+               this.moveFires(this.fires, x, y);
+            }
+         }
+         moveFires(obj, x, y) {
+            let initX = x;
+            let initY = y;
+            let speedX = (Math.random() < 0.5 ? '-' : '') + getRandom(1, 10);
+            speedX = parseFloat(speedX);
+            let speedY = (Math.random() < 0.5 ? '-' : '') + getRandom(1, 10);
+            speedY = parseFloat(speedY);
+            const timer = setInterval(() => {
+               initX += speedX;
+               initY += speedY++;
+               if (initX > x + 50 || initX < x - 50 || initY > y + 80) {
+                  clearInterval(timer);
+                  obj.remove();
+               }
+               obj.style.left = initX + 'px';
+               obj.style.top = initY + 'px';
+            }, 50);
+         }
+      }
+
+      document.querySelector('.btn_right').addEventListener('click', function() {
+         const x = html.clientWidth / 2;
+         const y = html.clientHeight / 2;
+         new FontFire(x, y);
+      });
+   </script>
+</body>
+
+</html>
