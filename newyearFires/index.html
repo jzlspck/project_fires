@@ -95,6 +95,7 @@
 <body>
    <button class="btn btn_left">放烟花</button>
    <button class="btn btn_right">输入文字</button>
+   <!-- 导入上升函数 -->
    <script src="js/riseAnimate.js"></script>
    <script>
       // 产生随机数
@@ -105,7 +106,7 @@
       const randomColor = () => {
          return `rgb(${getRandom(127, 255)}, ${getRandom(127, 255)}, ${getRandom(127, 255)})`;
       };
-      // 生成烟花类0000
+      // 生成烟花类
       class Fire {
          constructor(x, y) {
             this.x = x;
@@ -125,10 +126,15 @@
                this.createFireLine();
             });
          }
+         // 创建烟花行固定圆形区域位置
          createFireLine() {
+            // 每一行的随机颜色数组
             const colorArr = [];
+            // 每一行烟花点个数
             const size = getRandom(5, 10);
+            // 烟花点样式
             const fireworksSize = Math.random() > 0.5 ? true : false;
+            // 行数
             const lines = 20;
             for (let i = 0; i < size; i++) {
                colorArr.push(randomColor());
@@ -143,7 +149,9 @@
                this.createFireworks(this.fireLine, size, colorArr, fireworksSize);
             }
          }
+         // 创建每一行里的烟花点
          createFireworks(obj, size, colorArr, fireworksSize) {
+            // 两秒后删除烟花行
             setTimeout(() => {
                obj.remove();
             }, 2000);
@@ -157,6 +165,7 @@
                this.moveFireworks(this.fireworks, index);
             }
          }
+         // 烟花点移动动画
          moveFireworks(obj, i) {
             setTimeout(() => {
                obj.style.left = (i + 1) * 10 + 'px';
@@ -177,11 +186,17 @@
       setInterval(function() {
          produceFire();
       }, 3000);
+      // 设置节流阀
+      let flag = null;
       document.querySelector('.btn_left').addEventListener('click', function() {
-         setTimeout(function() {
+         if (flag) return;
+         flag = setTimeout(function() {
             for (let i = 0; i < 4; i++) {
                produceFire();
             }
+            setTimeout(() => {
+               flag = null;
+            }, 4000)
          }, 1000);
       });
       // 烟花文字类
@@ -202,24 +217,30 @@
             document.body.appendChild(fire);
             riseAnimate(fire, this.y, () => {
                fire.remove();
-               this.createFont();
+               this.createFont(true);
+               setTimeout(() => {
+                  this.createFont();
+               }, 1500);
             });
          }
-         createFont() {
+         createFont(flag) {
             this.fontFire = document.createElement('span');
             this.fontFire.className = 'fontfire';
             this.fontFire.innerHTML = this.font;
             document.body.appendChild(this.fontFire);
-            this.moveFont(this.fontFire);
+            this.moveFont(this.fontFire, flag);
          }
-         moveFont(obj) {
+         moveFont(obj, flag) {
+            const scale = html.clientWidth > 980 ? 1.6 : 1;
             setTimeout(() => {
-               obj.style.transform = 'scale(1)';
+               obj.style.transform = `scale(${scale})`;
                setTimeout(() => {
                   obj.style.opacity = 0;
-                  obj.style.transform = 'scale(1.1) translate(-10px, 10px)';
+                  obj.style.transform = `scale(${scale + 0.1}) translate(-10px, 10px)`;
                   setTimeout(() => {
                      obj.remove();
+                     // 这行代码可以清除第一次文字烟花后的随机烟花效果
+                     // if (flag) return;
                      for (let i = 0; i < 4; i++) {
                         const x = this.x + parseFloat((Math.random() < 0.5 ? '-' : '') + getRandom(50, 100));
                         const y = this.y + parseFloat((Math.random() < 0.5 ? '-' : '') + getRandom(30, 50));
