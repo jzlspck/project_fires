@@ -3,7 +3,7 @@ function riseAnimate(obj, target, callBack) {
    clearInterval(obj.timer);
    // 给不同元素指定不同定时器 给obj对象添加属性
    obj.timer = setInterval(function() {
-      if (obj.offsetTop == target) {
+      if (obj.offsetTop <= target) {
          clearInterval(obj.timer);
          // 定时器结束调用回调函数
          callBack && callBack();
