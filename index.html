@@ -5,7 +5,7 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-   <title>Document</title>
+   <title>新春快乐</title>
    <style>
       html,
       body {
@@ -241,9 +241,10 @@
                      obj.remove();
                      // 这行代码可以清除第一次文字烟花后的随机烟花效果
                      // if (flag) return;
-                     for (let i = 0; i < 4; i++) {
+                     const firesNum = html.clientWidth < 980 ? 2 : 4;
+                     for (let i = 0; i < firesNum; i++) {
                         const x = this.x + parseFloat((Math.random() < 0.5 ? '-' : '') + getRandom(50, 100));
-                        const y = this.y + parseFloat((Math.random() < 0.5 ? '-' : '') + getRandom(30, 50));
+                        const y = this.y + parseFloat((Math.random() < 0.5 ? '-' : '') + getRandom(0, 50));
                         this.createFires(x, y);
                      }
                   }, 1000);
